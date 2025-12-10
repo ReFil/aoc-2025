@@ -8,38 +8,38 @@ fn main() {
     let parts = contents.split("\n");
     let parts_collection = parts.collect::<Vec<&str>>();
 
-    let mut beams_vec: Vec<i32> = Vec::new();
+    let mut beams_vec: Vec<i128> = Vec::new();
 
     for i in 0..parts_collection[0].len() {
         if parts_collection[0][i..i+1] == *"S" {
-            beams_vec.push(i.try_into().unwrap());
+            beams_vec.push(1);
         }
+        else {beams_vec.push(0);}
     }
     dbg!(&beams_vec);
     let mut split_count = 0;
 
     for j in 1..parts_collection.len() {
-        let old_beams_vec = beams_vec;
-        beams_vec = Vec::new();
         for i in 0..parts_collection[j].len() {
-            if parts_collection[j][i..i+1] == *"^" && old_beams_vec.contains(&(<usize as TryInto<i32>>::try_into(i).unwrap())){
+            if parts_collection[j][i..i+1] == *"^" && beams_vec[i] > 0 {
                 if i > 0 {
-                   beams_vec.push((i-1).try_into().unwrap());
+                   beams_vec[i-1] += beams_vec[i];
                 }
                 if i < parts_collection[j].len() {
-                    beams_vec.push((i+1).try_into().unwrap());
+                    beams_vec[i+1] += beams_vec[i];
                 }
+                beams_vec[i] = 0;
                 split_count+=1;
                 println!("Split occurred, line {}, position {}, count {}", j, i, split_count);
             }
-            if parts_collection[j][i..i+1] == *"." && old_beams_vec.contains(&(<usize as TryInto<i32>>::try_into(i).unwrap())) {
-                beams_vec.push(i.try_into().unwrap());
-            } 
-            beams_vec.dedup();
-            dbg!(&beams_vec);
+            //dbg!(&beams_vec);
         }
     }
 
-    println!("{}",beams_vec.len())
+    println!("Number of end beams {}", split_count);
+
+    let sum: i128 = beams_vec.iter().sum();
+    
+    println!("The sum of the elements is {}.", sum); 
 
 }
